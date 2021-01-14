@@ -10,6 +10,7 @@ export default createGlobalStyle`
 
   body {
     background: #EEEEEE  ;
+    color: #333;
     height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
@@ -19,7 +20,7 @@ export default createGlobalStyle`
   }
 
   body,input,button, select {
-    font-family: 'Roboto Slab', serif;
+    font-family: 'Roboto', sans-serif;
     font-size: 16px;
   }
 
