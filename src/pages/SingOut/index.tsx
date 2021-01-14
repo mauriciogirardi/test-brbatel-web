@@ -1,17 +1,17 @@
 import React, { useCallback, useRef } from 'react';
-import { FaUser, FaLock } from 'react-icons/fa';
+import { FaUser, FaLock, FaRegEnvelope } from 'react-icons/fa';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
-import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
 
-import { useAuth } from 'hooks/auth';
 import { useToast } from 'hooks/toast';
 
 import Input from 'components/Input';
 import Button from 'components/Button';
 
 import getValidationErrors from 'utils/getValidationErrors';
+import { useHistory } from 'react-router-dom';
+import api from 'service/api';
 import { Container, Content, Title, Logo } from './styles';
 
 interface FormData {
@@ -19,9 +19,9 @@ interface FormData {
   password: string;
 }
 
-const SingIn: React.FC = () => {
-  const { singIn } = useAuth();
+const SingOut: React.FC = () => {
   const { addToast } = useToast();
+  const history = useHistory();
 
   const formRef = useRef<FormHandles>(null);
 
@@ -31,18 +31,24 @@ const SingIn: React.FC = () => {
         formRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
           email: Yup.string().email().required('Email obrigatório'),
-          password: Yup.string().required('Senha obrigatório'),
+          password: Yup.string().min(6, 'No mínimo 6 digitos'),
         });
 
         await schema.validate(data, {
           abortEarly: false,
         });
 
-        await singIn({
-          email: data.email,
-          password: data.password,
+        await api.post('users', data);
+
+        addToast({
+          type: 'success',
+          title: 'Cadastro com sucesso',
+          description: 'Você já pode fazer o login.',
         });
+
+        history.push('/');
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const error = getValidationErrors(err);
@@ -52,12 +58,12 @@ const SingIn: React.FC = () => {
 
         addToast({
           type: 'error',
-          title: 'Erro na autenticação',
-          description: 'ocorreu um erro ao fazer login, cheque as credenciais.',
+          title: 'Erro no cadastro',
+          description: 'ocorreu um erro ao fazer o cadastro, tente novamente.',
         });
       }
     },
-    [addToast, singIn],
+    [addToast, history],
   );
 
   return (
@@ -69,12 +75,18 @@ const SingIn: React.FC = () => {
         </Logo>
 
         <Title>
-          Login
+          Cadastro
           <div />
         </Title>
 
         <Form onSubmit={handleSubmit} ref={formRef}>
-          <Input name="email" type="text" icon={FaUser} placeholder="E-mail" />
+          <Input name="name" type="text" icon={FaUser} placeholder="Nome" />
+          <Input
+            name="email"
+            type="text"
+            icon={FaRegEnvelope}
+            placeholder="E-mail"
+          />
           <Input
             name="password"
             type="password"
@@ -82,13 +94,11 @@ const SingIn: React.FC = () => {
             placeholder="Senha"
           />
 
-          <Button type="submit">Entrar</Button>
+          <Button type="submit">Cadastrar</Button>
         </Form>
-
-        <Link to="/singOut">cadastrar</Link>
       </Content>
     </Container>
   );
 };
 
-export default SingIn;
+export default SingOut;

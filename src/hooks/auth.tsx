@@ -1,10 +1,13 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
+
 import api from 'service/api';
 
 interface User {
   id: string;
-  email: string;
   name: string;
+  email: string;
+  occupation: string;
+  avatar: string;
 }
 
 interface AuthState {
@@ -17,19 +20,21 @@ interface SignInCredentials {
   password: string;
 }
 
-interface AuthContextProps {
+interface IAuthContext {
   user: User;
   singIn(credential: SignInCredentials): Promise<void>;
   signOut(): void;
   updateUser(user: User): void;
 }
 
-const AuthContext = createContext<AuthContextProps>({} as AuthContextProps);
+const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
 export const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>(() => {
     const token = localStorage.getItem('@brbatel:token');
     const user = localStorage.getItem('@brbatel:user');
+
+    console.log('oi');
 
     if (token && user) {
       api.defaults.headers.authorization = `Bearer ${token}`;
@@ -45,7 +50,9 @@ export const AuthProvider: React.FC = ({ children }) => {
       password,
     });
 
-    const { user, token } = response.data;
+    const { user, token, auth } = response.data;
+
+    console.log(auth);
 
     localStorage.setItem('@brbatel:token', token);
     localStorage.setItem('@brbatel:user', JSON.stringify(user));
@@ -81,7 +88,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   );
 };
 
-export function useAuth(): AuthContextProps {
+export function useAuth(): IAuthContext {
   const context = useContext(AuthContext);
 
   return context;
