@@ -31,7 +31,9 @@ const SingIn: React.FC = () => {
         formRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
-          email: Yup.string().email().required('Email obrigatório'),
+          email: Yup.string()
+            .email('Dígite um e-mail válido')
+            .required('Email obrigatório'),
           password: Yup.string().required('Senha obrigatório'),
         });
 

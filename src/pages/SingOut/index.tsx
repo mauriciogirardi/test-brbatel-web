@@ -32,7 +32,9 @@ const SingOut: React.FC = () => {
 
         const schema = Yup.object().shape({
           name: Yup.string().required('Nome obrigatório'),
-          email: Yup.string().email().required('Email obrigatório'),
+          email: Yup.string()
+            .email('Dígite um e-mail válido')
+            .required('Email obrigatório'),
           password: Yup.string().min(6, 'No mínimo 6 digitos'),
         });
 

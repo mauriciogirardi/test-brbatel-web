@@ -1,13 +1,13 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import api from 'service/api';
 
 interface User {
   id: string;
   name: string;
-  email: string;
-  occupation: string;
   avatar: string;
+  email: string;
 }
 
 interface AuthState {
@@ -30,11 +30,11 @@ interface IAuthContext {
 const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
 export const AuthProvider: React.FC = ({ children }) => {
+  const history = useHistory();
+
   const [data, setData] = useState<AuthState>(() => {
     const token = localStorage.getItem('@brbatel:token');
     const user = localStorage.getItem('@brbatel:user');
-
-    console.log('oi');
 
     if (token && user) {
       api.defaults.headers.authorization = `Bearer ${token}`;
@@ -50,9 +50,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       password,
     });
 
-    const { user, token, auth } = response.data;
-
-    console.log(auth);
+    const { user, token } = response.data;
 
     localStorage.setItem('@brbatel:token', token);
     localStorage.setItem('@brbatel:user', JSON.stringify(user));
@@ -60,6 +58,13 @@ export const AuthProvider: React.FC = ({ children }) => {
     api.defaults.headers.authorization = `Bearer ${token}`;
     setData({ token, user });
   }, []);
+
+  const signOut = useCallback(() => {
+    localStorage.removeItem('@brbatel:token');
+    localStorage.removeItem('@brbatel:user');
+    setData({} as AuthState);
+    history.push('/');
+  }, [history]);
 
   const updateUser = useCallback(
     (user: User) => {
@@ -72,12 +77,6 @@ export const AuthProvider: React.FC = ({ children }) => {
     },
     [setData, data.token],
   );
-
-  const signOut = useCallback(() => {
-    localStorage.removeItem('@brbatel:token');
-    localStorage.removeItem('@brbatel:user');
-    setData({} as AuthState);
-  }, []);
 
   return (
     <AuthContext.Provider
