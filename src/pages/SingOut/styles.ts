@@ -1,3 +1,4 @@
+import { shade } from 'polished';
 import styled, { keyframes } from 'styled-components';
 
 const animate = keyframes`
@@ -17,6 +18,19 @@ export const Container = styled.div`
   display: flex;
   justify-content: center;
   height: 100vh;
+
+  > a {
+    font-size: 30px;
+    color: #227968;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    transition: color 0.2s;
+
+    &:hover {
+      color: ${shade(0.2, '#227968')};
+    }
+  }
 `;
 
 export const Content = styled.div`

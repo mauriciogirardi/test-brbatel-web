@@ -82,17 +82,17 @@ const Product: React.FC = () => {
 
       const totalProducts = response.data
         .map(product => product.quantity)
-        .reduce((acc, num) => acc + num);
+        .reduce((acc, num) => acc + num, 0);
 
       setTotalQuantityProduct(totalProducts);
 
       const totalBuy = response.data
         .map(product => product.quantity * Number(product.price))
-        .reduce((acc, num) => acc + num);
+        .reduce((acc, num) => acc + num, 0);
 
       const totalSell = response.data
         .map(product => product.quantity * Number(product.resalePrice))
-        .reduce((acc, num) => acc + num);
+        .reduce((acc, num) => acc + num, 0);
 
       const total = totalSell - totalBuy;
 
@@ -115,25 +115,25 @@ const Product: React.FC = () => {
 
         if (searchField) {
           setProducts(productsFormatted);
+
+          const totalProducts = response.data
+            .map(product => product.quantity)
+            .reduce((acc, num) => acc + num, 0);
+
+          setTotalQuantityProduct(totalProducts);
+
+          const totalBuy = response.data
+            .map(product => product.quantity * Number(product.price))
+            .reduce((acc, num) => acc + num, 0);
+
+          const totalSell = response.data
+            .map(product => product.quantity * Number(product.resalePrice))
+            .reduce((acc, num) => acc + num, 0);
+
+          const total = totalSell - totalBuy;
+
+          setGrossProfitProduct(total);
         }
-
-        const totalProducts = response.data
-          .map(product => product.quantity)
-          .reduce((acc, num) => acc + num);
-
-        setTotalQuantityProduct(totalProducts);
-
-        const totalBuy = response.data
-          .map(product => product.quantity * Number(product.price))
-          .reduce((acc, num) => acc + num);
-
-        const totalSell = response.data
-          .map(product => product.quantity * Number(product.resalePrice))
-          .reduce((acc, num) => acc + num);
-
-        const total = totalSell - totalBuy;
-
-        setGrossProfitProduct(total);
       } catch {
         addToast({
           type: 'error',
@@ -183,6 +183,24 @@ const Product: React.FC = () => {
           ...products,
         ]);
 
+        const totalProducts = [response.data, ...products]
+          .map(product => product.quantity)
+          .reduce((acc, num) => acc + num, 0);
+
+        setTotalQuantityProduct(totalProducts);
+
+        const totalBuy = [response.data, ...products]
+          .map(product => product.quantity * Number(product.price))
+          .reduce((acc, num) => acc + num, 0);
+
+        const totalSell = [response.data, ...products]
+          .map(product => product.quantity * Number(product.resalePrice))
+          .reduce((acc, num) => acc + num, 0);
+
+        const total = totalSell - totalBuy;
+
+        setGrossProfitProduct(total);
+
         addToast({
           type: 'success',
           title: 'Produto cadastrado com sucesso',
@@ -228,6 +246,24 @@ const Product: React.FC = () => {
 
       setProducts(findProduct);
       toggleDeleteModal();
+
+      const totalProducts = findProduct
+        .map(product => product.quantity)
+        .reduce((acc, num) => acc + num, 0);
+
+      setTotalQuantityProduct(totalProducts);
+
+      const totalBuy = findProduct
+        .map(product => product.quantity * Number(product.price))
+        .reduce((acc, num) => acc + num, 0);
+
+      const totalSell = findProduct
+        .map(product => product.quantity * Number(product.resalePrice))
+        .reduce((acc, num) => acc + num, 0);
+
+      const total = totalSell - totalBuy;
+
+      setGrossProfitProduct(total);
 
       addToast({
         type: 'info',
@@ -288,6 +324,24 @@ const Product: React.FC = () => {
           ),
         );
 
+        const totalProducts = [response.data, ...products]
+          .map(p => p.quantity)
+          .reduce((acc, num) => acc + num, 0);
+
+        setTotalQuantityProduct(totalProducts);
+
+        const totalBuy = [response.data, ...products]
+          .map(p => p.quantity * Number(p.price))
+          .reduce((acc, num) => acc + num, 0);
+
+        const totalSell = [response.data, ...products]
+          .map(p => p.quantity * Number(p.resalePrice))
+          .reduce((acc, num) => acc + num, 0);
+
+        const total = totalSell - totalBuy;
+
+        setGrossProfitProduct(total);
+
         addToast({
           type: 'success',
           title: 'Editado com sucesso.',
@@ -324,6 +378,24 @@ const Product: React.FC = () => {
           ),
         );
 
+        const totalProducts = [response.data, ...products]
+          .map(p => p.quantity)
+          .reduce((acc, num) => acc + num, 0);
+
+        setTotalQuantityProduct(totalProducts);
+
+        const totalBuy = [response.data, ...products]
+          .map(p => p.quantity * Number(p.price))
+          .reduce((acc, num) => acc + num, 0);
+
+        const totalSell = [response.data, ...products]
+          .map(p => p.quantity * Number(p.resalePrice))
+          .reduce((acc, num) => acc + num, 0);
+
+        const total = totalSell - totalBuy;
+
+        setGrossProfitProduct(total);
+
         setTotalQuantityProduct(totalQuantityProduct + 1);
       } catch {
         addToast({
@@ -358,6 +430,25 @@ const Product: React.FC = () => {
               : mappedProduct,
           ),
         );
+
+        const totalProducts = [response.data, ...products]
+          .map(p => p.quantity)
+          .reduce((acc, num) => acc + num, 0);
+
+        setTotalQuantityProduct(totalProducts);
+
+        const totalBuy = [response.data, ...products]
+          .map(p => p.quantity * Number(p.price))
+          .reduce((acc, num) => acc + num, 0);
+
+        const totalSell = [response.data, ...products]
+          .map(p => p.quantity * Number(p.resalePrice))
+          .reduce((acc, num) => acc + num, 0);
+
+        const total = totalSell - totalBuy;
+
+        setGrossProfitProduct(total);
+
         setTotalQuantityProduct(totalQuantityProduct - 1);
       } catch {
         addToast({

@@ -1,8 +1,9 @@
 import React, { useCallback, useRef } from 'react';
-import { FaUser, FaLock, FaRegEnvelope } from 'react-icons/fa';
+import { FaUser, FaLock, FaRegEnvelope, FaArrowLeft } from 'react-icons/fa';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
+import { useHistory, Link } from 'react-router-dom';
 
 import { useToast } from 'hooks/toast';
 
@@ -10,7 +11,6 @@ import Input from 'components/Input';
 import Button from 'components/Button';
 
 import getValidationErrors from 'utils/getValidationErrors';
-import { useHistory } from 'react-router-dom';
 import api from 'service/api';
 import { Container, Content, Title, Logo } from './styles';
 
@@ -70,6 +70,10 @@ const SingOut: React.FC = () => {
 
   return (
     <Container>
+      <Link to="/">
+        <FaArrowLeft />
+      </Link>
+
       <Content>
         <Logo>
           <h1>br</h1>
