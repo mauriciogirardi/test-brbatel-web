@@ -2,10 +2,12 @@
   "compilerOptions": {
     "baseUrl": "src",
     "target": "es5",
+    "types": ["cypress"],
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "es5"
     ],
     "allowJs": true,
     "skipLibCheck": true,

@@ -46,11 +46,12 @@ interface DeleteProduct {
 }
 
 const Product: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
   const { addToast } = useToast();
+
   const [products, setProducts] = useState<ProductsProps[]>([]);
 
   const [searchField, setSearchField] = useState<string>();
-
   const [totalQuantityProduct, setTotalQuantityProduct] = useState(0);
   const [grossProfitProduct, setGrossProfitProduct] = useState(0);
 
@@ -64,7 +65,25 @@ const Product: React.FC = () => {
     {} as ProductsProps,
   );
 
-  const formRef = useRef<FormHandles>(null);
+  const handleTotalFooter = useCallback((data: ProductsProps[]): void => {
+    const totalProducts = data
+      .map(p => p.quantity)
+      .reduce((acc, num) => acc + num, 0);
+
+    setTotalQuantityProduct(totalProducts);
+
+    const totalBuy = data
+      .map(p => p.quantity * Number(p.price))
+      .reduce((acc, num) => acc + num, 0);
+
+    const totalSell = data
+      .map(p => p.quantity * Number(p.resalePrice))
+      .reduce((acc, num) => acc + num, 0);
+
+    const total = totalSell - totalBuy;
+
+    setGrossProfitProduct(total);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -80,25 +99,9 @@ const Product: React.FC = () => {
         setProducts(formattedProducts);
       }
 
-      const totalProducts = response.data
-        .map(product => product.quantity)
-        .reduce((acc, num) => acc + num, 0);
-
-      setTotalQuantityProduct(totalProducts);
-
-      const totalBuy = response.data
-        .map(product => product.quantity * Number(product.price))
-        .reduce((acc, num) => acc + num, 0);
-
-      const totalSell = response.data
-        .map(product => product.quantity * Number(product.resalePrice))
-        .reduce((acc, num) => acc + num, 0);
-
-      const total = totalSell - totalBuy;
-
-      setGrossProfitProduct(total);
+      handleTotalFooter(formattedProducts);
     })();
-  }, [searchField]);
+  }, [searchField, handleTotalFooter]);
 
   useEffect(() => {
     (async () => {
@@ -116,23 +119,7 @@ const Product: React.FC = () => {
         if (searchField) {
           setProducts(productsFormatted);
 
-          const totalProducts = response.data
-            .map(product => product.quantity)
-            .reduce((acc, num) => acc + num, 0);
-
-          setTotalQuantityProduct(totalProducts);
-
-          const totalBuy = response.data
-            .map(product => product.quantity * Number(product.price))
-            .reduce((acc, num) => acc + num, 0);
-
-          const totalSell = response.data
-            .map(product => product.quantity * Number(product.resalePrice))
-            .reduce((acc, num) => acc + num, 0);
-
-          const total = totalSell - totalBuy;
-
-          setGrossProfitProduct(total);
+          handleTotalFooter(productsFormatted);
         }
       } catch {
         addToast({
@@ -142,7 +129,7 @@ const Product: React.FC = () => {
         });
       }
     })();
-  }, [addToast, searchField]);
+  }, [addToast, searchField, handleTotalFooter]);
 
   const handleSubmit = useCallback(
     async (data: FormDataProduct) => {
@@ -247,23 +234,7 @@ const Product: React.FC = () => {
       setProducts(findProduct);
       toggleDeleteModal();
 
-      const totalProducts = findProduct
-        .map(product => product.quantity)
-        .reduce((acc, num) => acc + num, 0);
-
-      setTotalQuantityProduct(totalProducts);
-
-      const totalBuy = findProduct
-        .map(product => product.quantity * Number(product.price))
-        .reduce((acc, num) => acc + num, 0);
-
-      const totalSell = findProduct
-        .map(product => product.quantity * Number(product.resalePrice))
-        .reduce((acc, num) => acc + num, 0);
-
-      const total = totalSell - totalBuy;
-
-      setGrossProfitProduct(total);
+      handleTotalFooter(findProduct);
 
       addToast({
         type: 'info',
@@ -276,7 +247,7 @@ const Product: React.FC = () => {
         description: 'Erro ao excluir produto, tente novamente.',
       });
     }
-  }, [addToast, deleteProduct, products, toggleDeleteModal]);
+  }, [addToast, deleteProduct, products, toggleDeleteModal, handleTotalFooter]);
 
   const handleDelete = useCallback(
     (id: DeleteProduct) => {
@@ -310,37 +281,21 @@ const Product: React.FC = () => {
           ...product,
         });
 
-        setProducts(
-          products.map(mappedProduct =>
-            mappedProduct.id === editingProduct.id
-              ? {
-                  ...response.data,
-                  priceFormatted: formattedCurrency(Number(product.price)),
-                  resalePriceFormatted: formattedCurrency(
-                    Number(product.resalePrice),
-                  ),
-                }
-              : mappedProduct,
-          ),
+        const updateProduct = products.map(mappedProduct =>
+          mappedProduct.id === editingProduct.id
+            ? {
+                ...response.data,
+                priceFormatted: formattedCurrency(Number(product.price)),
+                resalePriceFormatted: formattedCurrency(
+                  Number(product.resalePrice),
+                ),
+              }
+            : mappedProduct,
         );
 
-        const totalProducts = [response.data, ...products]
-          .map(p => p.quantity)
-          .reduce((acc, num) => acc + num, 0);
+        setProducts(updateProduct);
 
-        setTotalQuantityProduct(totalProducts);
-
-        const totalBuy = [response.data, ...products]
-          .map(p => p.quantity * Number(p.price))
-          .reduce((acc, num) => acc + num, 0);
-
-        const totalSell = [response.data, ...products]
-          .map(p => p.quantity * Number(p.resalePrice))
-          .reduce((acc, num) => acc + num, 0);
-
-        const total = totalSell - totalBuy;
-
-        setGrossProfitProduct(total);
+        handleTotalFooter(updateProduct);
 
         addToast({
           type: 'success',
@@ -354,7 +309,7 @@ const Product: React.FC = () => {
         });
       }
     },
-    [addToast, products, editingProduct],
+    [addToast, products, editingProduct, handleTotalFooter],
   );
 
   const handlePlusQuantityProduct = useCallback(
@@ -364,39 +319,21 @@ const Product: React.FC = () => {
           quantity: product.quantity + 1,
         });
 
-        setProducts(
-          products.map(mappedProduct =>
-            mappedProduct.id === product.id
-              ? {
-                  ...response.data,
-                  priceFormatted: formattedCurrency(Number(product.price)),
-                  resalePriceFormatted: formattedCurrency(
-                    Number(product.resalePrice),
-                  ),
-                }
-              : mappedProduct,
-          ),
+        const updateProductQuantity = products.map(mappedProduct =>
+          mappedProduct.id === product.id
+            ? {
+                ...response.data,
+                priceFormatted: formattedCurrency(Number(product.price)),
+                resalePriceFormatted: formattedCurrency(
+                  Number(product.resalePrice),
+                ),
+              }
+            : mappedProduct,
         );
 
-        const totalProducts = [response.data, ...products]
-          .map(p => p.quantity)
-          .reduce((acc, num) => acc + num, 0);
+        setProducts(updateProductQuantity);
 
-        setTotalQuantityProduct(totalProducts);
-
-        const totalBuy = [response.data, ...products]
-          .map(p => p.quantity * Number(p.price))
-          .reduce((acc, num) => acc + num, 0);
-
-        const totalSell = [response.data, ...products]
-          .map(p => p.quantity * Number(p.resalePrice))
-          .reduce((acc, num) => acc + num, 0);
-
-        const total = totalSell - totalBuy;
-
-        setGrossProfitProduct(total);
-
-        setTotalQuantityProduct(totalQuantityProduct + 1);
+        handleTotalFooter(updateProductQuantity);
       } catch {
         addToast({
           type: 'error',
@@ -405,7 +342,7 @@ const Product: React.FC = () => {
         });
       }
     },
-    [products, addToast, totalQuantityProduct],
+    [products, addToast, handleTotalFooter],
   );
 
   const handleMinusQuantityProduct = useCallback(
@@ -417,39 +354,21 @@ const Product: React.FC = () => {
           quantity: quantityMinus > 0 ? quantityMinus - 1 : 0,
         });
 
-        setProducts(
-          products.map(mappedProduct =>
-            mappedProduct.id === product.id
-              ? {
-                  ...response.data,
-                  priceFormatted: formattedCurrency(Number(product.price)),
-                  resalePriceFormatted: formattedCurrency(
-                    Number(product.resalePrice),
-                  ),
-                }
-              : mappedProduct,
-          ),
+        const updateProductQuantity = products.map(mappedProduct =>
+          mappedProduct.id === product.id
+            ? {
+                ...response.data,
+                priceFormatted: formattedCurrency(Number(product.price)),
+                resalePriceFormatted: formattedCurrency(
+                  Number(product.resalePrice),
+                ),
+              }
+            : mappedProduct,
         );
 
-        const totalProducts = [response.data, ...products]
-          .map(p => p.quantity)
-          .reduce((acc, num) => acc + num, 0);
+        setProducts(updateProductQuantity);
 
-        setTotalQuantityProduct(totalProducts);
-
-        const totalBuy = [response.data, ...products]
-          .map(p => p.quantity * Number(p.price))
-          .reduce((acc, num) => acc + num, 0);
-
-        const totalSell = [response.data, ...products]
-          .map(p => p.quantity * Number(p.resalePrice))
-          .reduce((acc, num) => acc + num, 0);
-
-        const total = totalSell - totalBuy;
-
-        setGrossProfitProduct(total);
-
-        setTotalQuantityProduct(totalQuantityProduct - 1);
+        handleTotalFooter(updateProductQuantity);
       } catch {
         addToast({
           type: 'error',
@@ -458,7 +377,7 @@ const Product: React.FC = () => {
         });
       }
     },
-    [products, addToast, totalQuantityProduct],
+    [products, addToast, handleTotalFooter],
   );
 
   const handleSearchKeyUp = useCallback(

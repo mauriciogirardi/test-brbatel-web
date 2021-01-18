@@ -49,6 +49,7 @@ const Input: React.FC<InputProps> = ({
 
   return (
     <Container
+      id="input-container"
       style={containerStyle}
       isFocused={isFocused}
       isFilled={isFilled}
