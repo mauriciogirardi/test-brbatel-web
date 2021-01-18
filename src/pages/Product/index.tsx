@@ -159,7 +159,7 @@ const Product: React.FC = () => {
           resalePrice: Number(formattedResalePrice),
         });
 
-        setProducts([
+        const submitData = [
           {
             ...response.data,
             priceFormatted: formattedCurrency(Number(response.data.price)),
@@ -168,25 +168,11 @@ const Product: React.FC = () => {
             ),
           },
           ...products,
-        ]);
+        ];
 
-        const totalProducts = [response.data, ...products]
-          .map(product => product.quantity)
-          .reduce((acc, num) => acc + num, 0);
+        setProducts(submitData);
 
-        setTotalQuantityProduct(totalProducts);
-
-        const totalBuy = [response.data, ...products]
-          .map(product => product.quantity * Number(product.price))
-          .reduce((acc, num) => acc + num, 0);
-
-        const totalSell = [response.data, ...products]
-          .map(product => product.quantity * Number(product.resalePrice))
-          .reduce((acc, num) => acc + num, 0);
-
-        const total = totalSell - totalBuy;
-
-        setGrossProfitProduct(total);
+        handleTotalFooter(submitData);
 
         addToast({
           type: 'success',
@@ -209,7 +195,7 @@ const Product: React.FC = () => {
         });
       }
     },
-    [addToast, products],
+    [addToast, products, handleTotalFooter],
   );
 
   const handleFormattedCurrency = useCallback(
